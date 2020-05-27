@@ -1,7 +1,7 @@
 # from tkinter import *
 import tkinter as tk
 from tkinter import ttk
-import random
+from tkinter import colorchooser as co
 
 class MonCanvas(tk.Canvas):
     # Constructeur de la sous-classe/classe fille
@@ -46,34 +46,77 @@ class MonCadre(tk.Frame):
 
     # Fonction privée
     def __create_spinbox(self):
-        self.x_depart = ttk.Spinbox(self, from_=0, to=800)
-        self.x_depart.set(400)
-        self.y_depart = ttk.Spinbox(self, from_=0, to=800)
-        self.y_depart.set(300)
-        self.largeur = ttk.Spinbox(self, from_=0, to=800)
-        self.largeur.set(200)
-        self.hauteur = ttk.Spinbox(self, from_=0, to=600)
-        self.hauteur.set(200)
+        self.spin_boxes = []
+        values = (400, 300, 200, 200)
+        intervals = ((0, 800), (0, 800), (0, 800), (0, 600))
+
+        for i in range(4):
+            spin = ttk.Spinbox(self, from_=intervals[i][0], to=intervals[i][1])
+            self.spin_boxes.append(spin)
+            spin.set(values[i])
+
     def __create_label(self):
-        self.x_label = tk.Label(self, text="X")
-        self.y_label = tk.Label(self, text="Y")
-        self.l_label = tk.Label(self, text="L")
-        self.h_label = tk.Label(self, text="H")
+        self.labels = []
+        values = ("X", "Y", "L", "H")
+        for i in range(4):
+            self.labels.append(tk.Label(self, text=values[i]))
+
     def __layout(self):
-        self.x_label.grid(row=1, column=0)
-        self.x_depart.grid(row=1, column=1)
-        self.y_label.grid(row=1, column=2)
-        self.y_depart.grid(row=1, column=3)
-        self.l_label.grid(row=1, column=4)
-        self.largeur.grid(row=1, column=5)
-        self.h_label.grid(row=1, column=6)
-        self.hauteur.grid(row=1, column=7)
+        values = ((1, 0), (1, 2), (1, 4), (1, 6))
+        for i in range(4):
+            self.labels[i].grid(row=values[i][0], column=values[i][1])
+
+        spin_grid_tpl = ((1, 1), (1, 3), (1, 5), (1, 7))
+        for i in range(4):
+            self.spin_boxes[i].grid(row=spin_grid_tpl[i][0], column=spin_grid_tpl[i][1])
+
+    def get_values(self):
+        values = []
+        for i in range(4):
+            values.append(int(self.spin_boxes[i].get()))
+        return values
+
+class MaGeometrie(tk.Frame):
+    def __init__(self, boss):
+        tk.Frame.__init__(self, master=boss)
+
+        self.formes = ttk.Combobox(self, values=["rectangle", "ovale"])
+        # sticky values => w: ouest e: est n: nord s:sud
+        self.formes.grid(row=2, columnspan=2, sticky="we")
+        self.formes.set("rectangle")
+
+        self.bouton_couleur = ttk.Button(self, text="Choisir une couleur", \
+                                    command=self.__definir_couleur)
+        self.bouton_couleur.grid(row=2, column=2, columnspan=2, sticky="e")
+
+        # Frame
+        self.frame_color = tk.Frame(self, width="60", height="20", bg="black")
+        self.frame_color.grid(row=2, column=5, sticky="w")
+
+    def get_forme(self):
+        return self.formes.get()
+
+    def get_color(self):
+        return self.couleur
+
+    def __definir_couleur(self):
+        couleur_tpl = co.askcolor()
+        hexa_couleur = couleur_tpl[1]
+
+        if hexa_couleur is not None:
+            # print(hexa_couleur)
+            self.couleur = hexa_couleur
+            self.frame_color.configure(bg=hexa_couleur)
+        else:
+            print("Vous n'avez pas choisi de couleur")
 
 if __name__ == '__main__':
 
     fen = tk.Tk()
-    cadre = MonCadre(fen)
-    cadre.pack()
+#    cadre = MonCadre(fen)
+#    cadre.pack()
+    geom = MaGeometrie(fen)
+    geom.pack()
 
     # J'éxecute le fichier présent
 
