@@ -1,6 +1,6 @@
 # from tkinter import *
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox as mbox
 from tkinter import colorchooser as co
 
 class MonCanvas(tk.Canvas):
@@ -20,7 +20,10 @@ class MonCanvas(tk.Canvas):
             self.itemconfig(self.sel_object, width=5)
             self.lift(self.sel_object)
         else:
-            self.delete(self.sel_object)
+            #Suppression de l'objet
+            reponse = mbox.askyesno("Suppression d'objet", "Êtes-vous certain de vouloir supprimer cet objet ?")
+            if reponse:
+                self.delete(self.sel_object)
     def mouse_up(self, event):
         self.itemconfig(self.sel_object, width=1)
 
@@ -37,9 +40,12 @@ class MonCanvas(tk.Canvas):
         else:
             self.configure(bg="white")
 
-class MonCadre(tk.Frame):
-    def __init__(self, boss):
-        tk.Frame.__init__(self, master=boss)
+#class MonCadre(tk.Frame):
+class MonCadre(tk.Toplevel):
+    def __init__(self, boss, *args, **kwargs):
+        print(kwargs)   #Dictionnaire clé/valeur
+        print(args)     #Tuple de paramètres
+        tk.Toplevel.__init__(self, master=boss)
         self.__create_spinbox()
         self.__create_label()
         self.__layout()
@@ -76,9 +82,10 @@ class MonCadre(tk.Frame):
             values.append(int(self.spin_boxes[i].get()))
         return values
 
-class MaGeometrie(tk.Frame):
+#class MaGeometrie(tk.Frame):
+class MaGeometrie(tk.Toplevel):
     def __init__(self, boss):
-        tk.Frame.__init__(self, master=boss)
+        tk.Toplevel.__init__(self, master=boss)
 
         self.formes = ttk.Combobox(self, values=["rectangle", "ovale"])
         # sticky values => w: ouest e: est n: nord s:sud
@@ -92,6 +99,7 @@ class MaGeometrie(tk.Frame):
         # Frame
         self.frame_color = tk.Frame(self, width="60", height="20", bg="black")
         self.frame_color.grid(row=2, column=5, sticky="w")
+        self.couleur = "white"
 
     def get_forme(self):
         return self.formes.get()
@@ -112,27 +120,7 @@ class MaGeometrie(tk.Frame):
 
 if __name__ == '__main__':
 
-    fen = tk.Tk()
-#    cadre = MonCadre(fen)
-#    cadre.pack()
+    root = tk.Tk()
     geom = MaGeometrie(fen)
-    geom.pack()
-
-    # J'éxecute le fichier présent
-
-    # canvas = MonCanvas(fen, 500, 300, "black")
-    # canvas.pack()
-    #
-    # couleurs = ("white", "royal blue", "yellow", "green", "pink", "purple")
-    #
-    # for i in range(15):
-    #     couleur = couleurs[random.randrange(6)]
-    #     x_dep = random.randrange(400)
-    #     y_dep = random.randrange(200)
-    #     largeur = random.randrange(300)
-    #     hauteur = random.randrange(300)
-    #     canvas.create_rectangle(x_dep, y_dep, x_dep+largeur, y_dep+hauteur, \
-    #                             fill=couleur)
-    #
-    # # On démarre le gestionnaire d'événements
-    fen.mainloop()
+    #On démarre le gestionnaire d'événements
+    root.mainloop()

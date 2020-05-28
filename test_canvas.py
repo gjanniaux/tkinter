@@ -1,4 +1,3 @@
-# from tkinter import *
 import tkinter as tk
 from tkinter import ttk
 import mes_widgets
@@ -27,36 +26,52 @@ def dessiner():
         elif forme == "ovale":
             canvas.create_oval(x, y, x + l, y + h, fill=couleur)
         else:
-            #tk.Message(fen, text="Forme non définie!")
             print("Forme non définie!")
     else:
         print("Pas de dessin en mode suppression")
 
 def update_mode():
     global mode
-    mode = bool(mode_suppr.var.get())
-    print(mode)
+    global radio_buttons
+    global varGr
+    if varGr.get() == 'S':
+        mode = True
+    else:
+        mode = False
+    #mode = bool(mode_suppr.var.get())
+    #print(mode)
     canvas.update_mode(mode)
 
-fen = tk.Tk()
-fen.title("Mon canvas interactif")
+# Fenêtre d'application principale
+root = tk.Tk()
+root.title("Mon canvas interactif")
 
-canvas = mes_widgets.MonCanvas(fen, 800, 600, "white")
+# Canvas: zone de dessin
+canvas = mes_widgets.MonCanvas(root, 800, 600, "white")
 canvas.grid(row=0, columnspan=8)
 
-form_cadre = mes_widgets.MonCadre(fen)
-form_cadre.grid(row=1, columnspan=8)
+# Fenêtres de type Toplevel, indépendantes, donc pas de placement
+form_cadre = mes_widgets.MonCadre(root, 2, "test", width="100", height="200", bg="white")
+form_cadre.title("Dimensions")
+geom = mes_widgets.MaGeometrie(root)
+geom.title("Géométrie")
 
-geom = mes_widgets.MaGeometrie(fen)
-geom.grid(row=2, columnspan=5)
-
-bouton = ttk.Button(fen, text="Dessiner!", command=dessiner)
+bouton = ttk.Button(root, text="Dessiner!", command=dessiner)
 bouton.grid(row=2, column=6)
 
-v = tk.IntVar()
-mode_suppr = tk.Checkbutton(fen, text="Supprimer", command=update_mode, variable=v)
-mode_suppr.grid(row=2, column=7)
-mode_suppr.var = v
-print(mode)
+#Radiobutton
+#Edition/Suppression
+vals = ['E', 'S']
+etiqs = ['Edition', 'Suppression']
+varGr = tk.StringVar()
+#Se positionner par défaut sur le mode Edition
+varGr.set(vals[0])
+radio_buttons = []
+radio_frame = tk.Frame(root)
+for i in range(2):
+    b = ttk.Radiobutton(radio_frame, variable=varGr, text=etiqs[i], value=vals[i], command=update_mode)
+    b.pack(side=tk.LEFT)
+radio_frame.grid(row=2, column=7)
+
 # On démarre le gestionnaire d'événements
-fen.mainloop()
+root.mainloop()
